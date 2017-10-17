@@ -129,6 +129,7 @@ def preprocess_image(image_path):
 		img = cv2.resize(img,(w, 256), interpolation = cv2.INTER_AREA)
 	img = img.astype(np.float32)
 	# random 244x224 patch
+	height, width, _ = img.shape
 	x = random.randint(0, width - 224)
 	y = random.randint(0, height - 224)
 	img_cropped=img[y:y+224, x:x+ 224]
@@ -170,6 +171,7 @@ def read_k_patches(image_path, k):
 	patches = []
 	for i in range(k):
 		# random 244x224 patch
+		height, width, _ = img.shape
 		x = random.randint(0, width - 224)
 		y = random.randint(0, height - 224)
 		img_cropped=img[y:y+224, x:x+ 224]

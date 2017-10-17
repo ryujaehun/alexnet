@@ -9,6 +9,7 @@ import numpy as np
 import threading
 
 def train(
+threads_numbers,
 		epochs, 
 		batch_size, 
 		learning_rate, 
@@ -100,7 +101,7 @@ def train(
 				sess.run(enqueue_op, feed_dict={x: im,y: l})
 
 		# creating and starting parallel threads to fill the queue
-		num_threads = 3
+		num_threads = threads_numbers
 		for i in range(num_threads):
 			t = threading.Thread(target=enqueue_batches)
 			t.setDaemon(True)
@@ -147,6 +148,7 @@ def train(
 
 
 if __name__ == '__main__':
+	Threads_numbers=16
 	DROPOUT = 0.5
 	LAMBDA = 5e-05 # for weight decay
 	LEARNING_RATE = 1e-03
@@ -168,6 +170,7 @@ if __name__ == '__main__':
 		resume = True
 
 	train(
+		Threads_numbers,
 		EPOCHS, 
 		BATCH_SIZE, 
 		LEARNING_RATE, 
