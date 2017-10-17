@@ -148,7 +148,7 @@ threads_numbers,
 
 
 if __name__ == '__main__':
-	Threads_numbers=16
+	Threads_numbers=4
 	DROPOUT = 0.5
 	LAMBDA = 5e-05 # for weight decay
 	LEARNING_RATE = 1e-03
@@ -166,7 +166,7 @@ if __name__ == '__main__':
 	TEST_STEP = 500
 	if len(sys.argv)==1:
 		resume=False
-	elif sys.argv[1] == '-r':
+	elif sys.argv[1] == '-resume':
 		resume = True
 
 	train(

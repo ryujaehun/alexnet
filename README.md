@@ -1,6 +1,8 @@
 # alexnet
 ___
+
 ## about
+
 The neural network, which has 60 million parameters and 650,000 neurons, consists
 of five convolutional layers, some of which are followed by max-pooling layers,
 and three fully-connected layers with a final 1000-way softmax. To make training
@@ -8,13 +10,22 @@ faster, we used non-saturating neurons and a very efficient GPU implementation
 of the convolution operation. To reduce overfitting in the fully-connected
 layers we employed a recently-developed regularization method called “dropout”
 that proved to be very effective.
+
 ## architecture
 ![](https://kratzert.github.io/images/finetune_alexnet/alexnet.png)
 
+## requirement
+
+* tensorflow-gpu (ver.1.3.1)
+* cv2 (ver.3.3.0)
+* numpy (ver 1.13.3)
+* scipy (ver 0.19.1)
+
+
 ## Usage
-1. 아래 다운로드 링크에서 자료를 다운 받는다.(LSVRC2012 train,val,test,Development kit (Task 1))
-1. 다운받은 파일을 untar한다.(etc에 스크립트 존재)
-1. train.py에서 `IMAGENET_PATH`와 필요하다면 hyperparameter를 수정한다.
+1. Download the image file from the link below.(LSVRC2012 train,val,test,Development kit (Task 1))
+1. untar.(There is a script in `etc`)
+1.Modify  `IMAGENET_PATH` in train.py hyperparameter(maybe you need).
 
 ## train
 
@@ -41,14 +52,18 @@ python3 test.py
 ```
 tensorboard --logdir path/to/summary/train/
 ```
+
 ![](https://galoismilk.org/storage/etc/graph-large_attrs_key=_too_large_attrs&limit_attr_size=1024&run=.png)
 
 
 ## TODO
-* ~~another optimizer 적용~~
-* ~~tensorboard 적용~~
-* ~~GPU 1개를 이용하여 최적화~~
-* ~~논문에 나온 최적화기법 모두 적용~~
+
+* ~~apply another optimizer ~~
+* ~~apply tensorboard ~~
+* ~~Fit to a GPU~~
+* ~~Application of the technique to the paper~~
+* Eliminate bottlenecks
+
 
 
 ## batch normaliztion
@@ -74,19 +89,24 @@ ILSVRC 2012 training set folder should be srtuctured like this:
 			|_ ...
 ```    
 
-### train파일은 그냥 untar하면 안되며 untar.sh를이용하여 폴더를 만든후 untar해야한다.
+### you must untar training file `untar.sh`
 
 
 ## download
+
 [download LSVRC 2012 image data file](http://www.image-net.org/challenges/LSVRC/2012/nonpub-downloads)
 
 ## optimizer
-이중에서 adam 적용
+
+Apply AdamOptimizer
 ![](http://i.imgur.com/2dKCQHh.gif?1)
 ![](http://i.imgur.com/pD0hWu5.gif?1)
 ![](http://i.imgur.com/NKsFHJb.gif?1)
 
+## Remove log
 
+If you do not want to see the log at startup
+train.py line 97, remove `allow_soft_placement=True, log_device_placement=True`
 
 ## references
 
@@ -94,3 +114,7 @@ ILSVRC 2012 training set folder should be srtuctured like this:
 [AlexNet training on ImageNet LSVRC 2012](https://github.com/dontfollowmeimcrazy/imagenet)
 [Tensorflow Models](https://github.com/tensorflow/models)
 [Tensorflow API](https://www.tensorflow.org/versions/r1.2/api_docs/)
+
+## Licence
+
+[MIT Licence](LICENSE)
