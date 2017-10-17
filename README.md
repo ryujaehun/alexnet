@@ -47,6 +47,9 @@ python3 train.py -resume
 python3 test.py
 ```
 
+## Classify
+
+
 ## tensorboard
 
 ```
@@ -111,8 +114,11 @@ train.py line 97, remove `allow_soft_placement=True, log_device_placement=True`
 ## references
 
 [optimizer](http://ruder.io/optimizing-gradient-descent/)
+
 [AlexNet training on ImageNet LSVRC 2012](https://github.com/dontfollowmeimcrazy/imagenet)
+
 [Tensorflow Models](https://github.com/tensorflow/models)
+
 [Tensorflow API](https://www.tensorflow.org/versions/r1.2/api_docs/)
 
 ## Licence
