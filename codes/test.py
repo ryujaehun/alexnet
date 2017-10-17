@@ -1,7 +1,7 @@
 
 import os.path
 import tensorflow as tf
-import train_util as tu
+import util as tu
 from models import alexnet
 import numpy as np
 

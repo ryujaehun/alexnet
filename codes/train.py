@@ -4,7 +4,7 @@ import os.path
 import time
 from models import alexnet
 import tensorflow as tf
-import train_util as tu
+import util as tu
 import numpy as np
 import threading
 
