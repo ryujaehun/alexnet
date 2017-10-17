@@ -7,15 +7,14 @@ import sys
 import os.path
 import tensorflow as tf
 import util as tu
-from alexnet import alexnet
+from models import alexnet
 import numpy as np
 
-
 def classify(
-		image,
-		top_k,
-		k_patches,
-		ckpt_path,
+		image, 
+		top_k, 
+		k_patches, 
+		ckpt_path, 
 		imagenet_path):
 	"""	Procedure to classify the image given through the command line
 
@@ -25,7 +24,7 @@ def classify(
 					to retrieve
 			k_patches:	number of crops taken from an image and to input to the model
 			ckpt_path:	path to model's tensorflow checkpoint
-			imagenet_path:	path to ILSRVC12 ImageNet folder containing train images,
+			imagenet_path:	path to ILSRVC12 ImageNet folder containing train images, 
 						validation images, annotations and metadata file
 
 	"""
@@ -58,17 +57,17 @@ def classify(
 
 
 if __name__ == '__main__':
-
 	TOP_K = 5
 	K_CROPS = 5
-	IMAGENET_PATH = 'ILSVRC2012'
+	IMAGENET_PATH = '/media/desktop/F64E50644E502023/ILSVRC2012'
 	CKPT_PATH = 'ckpt-alexnet'
 
 	image_path = sys.argv[1]
 
 	classify(
-		image_path,
-		TOP_K,
-		K_CROPS,
-		CKPT_PATH,
+		image_path, 
+		TOP_K, 
+		K_CROPS, 
+		CKPT_PATH, 
 		IMAGENET_PATH)
+

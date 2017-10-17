@@ -1,11 +1,15 @@
+"""
+Written by Matteo Dunnhofer - 2017
+
+Helper functions and procedures
+"""
 import os
 import random
-import tensorflow as tf
+import tensorflow as tf 
 import numpy as np
 from scipy.io import loadmat
 from PIL import Image
-
-#https://github.com/dontfollowmeimcrazy/imagenet
+import cv2
 
 ################ TensorFlow standard operations wrappers #####################
 def weight(shape, name):
@@ -35,15 +39,11 @@ def batch_norm(x):
 	batch_mean, batch_var = tf.nn.moments(x, [0])
 	return tf.nn.batch_normalization(x, batch_mean, batch_var, None, None, epsilon)
 
-
-
-
-
 ################ batch creation functions #####################
 
 def onehot(index):
 	""" It creates a one-hot vector with a 1.0 in
-		position represented by index
+		position represented by index 
 	"""
 	onehot = np.zeros(1000)
 	onehot[index] = 1.0
@@ -51,34 +51,35 @@ def onehot(index):
 
 def read_batch(batch_size, images_source, wnid_labels):
 	""" It returns a batch of single images (no data-augmentation)
-		ILSVRC 2012 training set folder should be srtuctured like this:
+
+		ILSVRC 2012 training set folder should be srtuctured like this: 
 		ILSVRC2012_img_train
 			|_n01440764
 			|_n01443537
 			|_n01484850
 			|_n01491361
-			|_ ...
+			|_ ... 
 
 		Args:
-			batch_size: batch size
+			batch_size: need explanation? :)
 			images_sources: path to ILSVRC 2012 training set folder
 			wnid_labels: list of ImageNet wnid lexicographically ordered
 
 		Returns:
-			batch_images: a tensor (numpy array of images) of shape [batch_size, width, height, channels]
+			batch_images: a tensor (numpy array of images) of shape [batch_size, width, height, channels] 
 			batch_labels: a tensor (numpy array of onehot vectors) of shape [batch_size, 1000]
 	"""
 	batch_images = []
 	batch_labels = []
 
 	for i in range(batch_size):
-	    class_index = random.randint(0, 999)
-		folder = wnid_labels[class_index]
-        #image 를 읽어 list에 넣는다
-		batch_images.append(read_image(os.path.join(images_source, folder)))
-        # labels을 onehot
-        batch_labels.append(onehot(class_index))
+		# random class choice 
+		# (randomly choose a folder of image of the same class from a list of previously sorted wnids)
+		class_index = random.randint(0, 999)
 
+		folder = wnid_labels[class_index]
+		batch_images.append(read_image(os.path.join(images_source, folder)))
+		batch_labels.append(onehot(class_index))
 
 	np.vstack(batch_images)
 	np.vstack(batch_labels)
@@ -93,18 +94,19 @@ def read_image(images_folder):
 		Returns:
 			im_array: the numpy array of the image [width, height, channels]
 	"""
-
+	# random image choice inside the folder 
+	# (randomly choose an image inside the folder)
 	image_path = os.path.join(images_folder, random.choice(os.listdir(images_folder)))
-
+	
 	# load and normalize image
 	im_array = preprocess_image(image_path)
 
-
+		
 	return im_array
 
 def preprocess_image(image_path):
 	""" It reads an image, it resize it to have the lowest dimesnion of 256px,
-		it randomly choose a 224x224 crop inside the resized image and normilize the numpy
+		it randomly choose a 224x224 crop inside the resized image and normilize the numpy 
 		array subtracting the ImageNet training set mean
 
 		Args:
@@ -113,31 +115,27 @@ def preprocess_image(image_path):
 		Returns:
 			cropped_im_array: the numpy array of the image normalized [width, height, channels]
 	"""
-	IMAGENET_MEAN = [123.68, 116.779, 103.939] # rgb format 일때 전처리 hyperparameter
-
-	img = Image.open(image_path).convert('RGB')
-
+	IMAGENET_MEAN = np.array([104., 117., 124.])
+	
+	img = cv2.imread(image_path)
+	height, width, _ = img.shape
+	if self.horizontal and np.random.random()<0.5:
+    	image = cv2.flip(image,1)
 	# resize of the image (setting lowest dimension to 256px)
-	if img.size[0] < img.size[1]:
-		h = int(float(256 * img.size[1]) / img.size[0])
-		img = img.resize((256, h), Image.ANTIALIAS)
+	if width <height:
+		h = int(float(256 * height) /width)
+		img = cv2.resize(img,(256, h),interpolation = cv2.INTER_AREA)
 	else:
-		w = int(float(256 * img.size[0]) / img.size[1])
-		img = img.resize((w, 256), Image.ANTIALIAS)
+		w = int(float(256 * width) / height)
+		img = cv2.resize(img,(w, 256), interpolation = cv2.INTER_AREA)
 
-	# random 224x224 patch
-	x = random.randint(0, img.size[0] - 224)
-	y = random.randint(0, img.size[1] - 224)
-    # 이미지를 짜른다. (224 초과분에서 224를 뺴서 )
-	img_cropped = img.crop((x, y, x + 224, y + 224))
-
-	cropped_im_array = np.array(img_cropped, dtype=np.float32)
-
-	for i in range(3):
-		cropped_im_array[:,:,i] -= IMAGENET_MEAN[i]
-
+	# random 244x224 patch
+	x = random.randint(0, width - 224)
+	y = random.randint(0, height - 224)
+	img_cropped=img[y:y+224, x:x+ 224]
+	img_cropped-=mean
+	
 	return cropped_im_array
-
 
 
 def read_k_patches(image_path, k):
@@ -150,41 +148,41 @@ def read_k_patches(image_path, k):
 		Returns:
 			patches: a tensor (numpy array of images) of shape [k, 224, 224, 3]
 
-        # 이미지에서 몇 개의 patch를 더 추출
 	"""
-	IMAGENET_MEAN = [123.68, 116.779, 103.939] # rgb format
-
-	img = Image.open(image_path).convert('RGB')
-
-	# resize of the image (setting largest border to 256px)
-	if img.size[0] < img.size[1]:
-		h = int(float(256 * img.size[1]) / img.size[0])
-		img = img.resize((256, h), Image.ANTIALIAS)
+	IMAGENET_MEAN = np.array([104., 117., 124.])
+	img = cv2.imread(image_path)
+	height, width, _ = img.shape
+	if self.horizontal and np.random.random()<0.5:
+    	image = cv2.flip(image,1)
+	# resize of the image (setting lowest dimension to 256px)
+	if width <height:
+		h = int(float(256 * height) /width)
+		img = cv2.resize(img,(256, h),interpolation = cv2.INTER_AREA)
 	else:
-		w = int(float(256 * img.size[0]) / img.size[1])
-		img = img.resize((w, 256), Image.ANTIALIAS)
+		w = int(float(256 * width) / height)
+		img = cv2.resize(img,(w, 256), interpolation = cv2.INTER_AREA)
+
+	# random 244x224 patch
+	
+	
+	
+
 
 	patches = []
 	for i in range(k):
 		# random 244x224 patch
-		x = random.randint(0, img.size[0] - 224)
-		y = random.randint(0, img.size[1] - 224)
-		img_cropped = img.crop((x, y, x + 224, y + 224))
-
-		cropped_im_array = np.array(img_cropped, dtype=np.float32)
-
-		for i in range(3):
-			cropped_im_array[:,:,i] -= IMAGENET_MEAN[i]
-
+		x = random.randint(0, width - 224)
+		y = random.randint(0, height - 224)
+		img_cropped=img[y:y+224, x:x+ 224]
+		img_cropped-=mean
 		patches.append(cropped_im_array)
 
 	np.vstack(patches)
 	return patches
 
-
+""" reading a batch of validation images from the validation set, 
+	groundthruths label are inside an annotations file """
 def read_validation_batch(batch_size, validation_source, annotations):
-    """ reading a batch of validation images from the validation set,
-    	groundthruths label are inside an annotations file """
 	batch_images_val = []
 	batch_labels_val = []
 
@@ -217,11 +215,11 @@ def load_imagenet_meta(meta_path):
 
 		Returns:
 			wnids: list of ImageNet wnids labels (as strings)
-			words: list of words (as strings) referring to wnids labels and describing the classes
+			words: list of words (as strings) referring to wnids labels and describing the classes 
 
 	"""
 	metadata = loadmat(meta_path, struct_as_record=False)
-
+	
 	# ['ILSVRC2012_ID', 'WNID', 'words', 'gloss', 'num_children', 'children', 'wordnet_height', 'num_train_images']
 	synsets = np.squeeze(metadata['synsets'])
 	ids = np.squeeze(np.array([s.ILSVRC2012_ID for s in synsets]))
